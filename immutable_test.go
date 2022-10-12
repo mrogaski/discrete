@@ -154,8 +154,40 @@ func TestImmutableSet_Union(t *testing.T) {
 			result := a.Union(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
-			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // subject intact
-			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // object intact
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
+}
+
+func TestImmutableSet_Difference(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want []rune
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: []rune{}},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: []rune{'X', 'Y', 'Z'}},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: []rune{}},
+		{name: "subtract 1", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X'}, want: []rune{'Y', 'Z'}},
+		{name: "subtract 2", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Z'}, want: []rune{'Y'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.Difference(b)
+
+			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
 		})
 	}
 }

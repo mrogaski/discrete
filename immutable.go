@@ -26,9 +26,9 @@ func NewImmutableSet[T comparable](members ...T) *ImmutableSet[T] {
 
 // Contains returns true if the given element is a member of the set.
 func (s *ImmutableSet[T]) Contains(elem T) bool {
-	_, ok := s.members[elem]
+	_, found := s.members[elem]
 
-	return ok
+	return found
 }
 
 // Size returns a count of the number of members contained in the set.
@@ -51,7 +51,7 @@ func (s *ImmutableSet[T]) Members() []T {
 	return result
 }
 
-// Union returns a set whose members are disjunction of both the subject and object sets, belonging to either set.
+// Union returns a set whose members are disjunction of both the receiver and argument sets, belonging to either set.
 func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	members := make([]T, s.Size()+sp.Size())
 
@@ -68,4 +68,19 @@ func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	}
 
 	return NewImmutableSet[T](members...)
+}
+
+// Difference returns a set whose members belong to the receiver but not the set passed as an argument.
+func (s *ImmutableSet[T]) Difference(sp *ImmutableSet[T]) *ImmutableSet[T] {
+	members := make([]T, 0)
+
+	for k := range s.members {
+		_, found := sp.members[k]
+
+		if !found {
+			members = append(members, k)
+		}
+	}
+
+	return NewImmutableSet(members...)
 }
