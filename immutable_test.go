@@ -73,6 +73,7 @@ func TestImmutableSet_Size(t *testing.T) {
 		{name: "empty", members: []rune{}, want: 0},
 		{name: "1 member", members: []rune{'A'}, want: 1},
 		{name: "2 member", members: []rune{'A', 'B'}, want: 2},
+		{name: "duplicates", members: []rune{'A', 'B', 'A', 'C', 'A', 'B'}, want: 3},
 	}
 
 	for _, tt := range tests {
