@@ -141,7 +141,9 @@ func TestImmutableSet_Union(t *testing.T) {
 		{name: "both empty", a: []rune{}, b: []rune{}, want: []rune{}},
 		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: []rune{'X', 'Y', 'Z'}},
 		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: []rune{'x', 'y', 'z'}},
-		{name: "A + B", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: []rune{'X', 'Y', 'Z', 'x', 'y', 'z'}},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: []rune{'X', 'Y', 'Z'}},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: []rune{'W', 'X', 'Y', 'Z'}},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: []rune{'X', 'Y', 'Z', 'x', 'y', 'z'}},
 	}
 
 	for _, tt := range tests {
@@ -152,6 +154,39 @@ func TestImmutableSet_Union(t *testing.T) {
 			a := set.NewImmutableSet(tt.a...)
 			b := set.NewImmutableSet(tt.b...)
 			result := a.Union(b)
+
+			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
+}
+
+func TestImmutableSet_Intersection(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want []rune
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: []rune{}},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: []rune{}},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: []rune{}},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: []rune{'X', 'Y', 'Z'}},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: []rune{'X', 'Y'}},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: []rune{}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.Intersection(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
 			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact

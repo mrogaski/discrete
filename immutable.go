@@ -51,7 +51,7 @@ func (s *ImmutableSet[T]) Members() []T {
 	return result
 }
 
-// Union returns a set whose members are disjunction of both the receiver and argument sets, belonging to either set.
+// Union returns a set whose members are a disjunction of both the receiver and argument sets, belonging to either set.
 func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	members := make([]T, s.Size()+sp.Size())
 
@@ -68,6 +68,22 @@ func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	}
 
 	return NewImmutableSet[T](members...)
+}
+
+// Intersection returns a set whose members are a conjunction of both the receiver and argument sets, belonging
+// to one set or the other but not both.
+func (s *ImmutableSet[T]) Intersection(sp *ImmutableSet[T]) *ImmutableSet[T] {
+	members := make([]T, 0)
+
+	for k := range s.members {
+		_, found := sp.members[k]
+
+		if found {
+			members = append(members, k)
+		}
+	}
+
+	return NewImmutableSet(members...)
 }
 
 // Difference returns a set whose members belong to the receiver but not the set passed as an argument.
