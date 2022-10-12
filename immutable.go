@@ -50,3 +50,22 @@ func (s *ImmutableSet[T]) Members() []T {
 
 	return result
 }
+
+// Union returns a set whose members are disjunction of both the subject and object sets, belonging to either set.
+func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
+	members := make([]T, s.Size()+sp.Size())
+
+	i := 0
+
+	for elem := range s.members {
+		members[i] = elem
+		i++
+	}
+
+	for elem := range sp.members {
+		members[i] = elem
+		i++
+	}
+
+	return NewImmutableSet[T](members...)
+}

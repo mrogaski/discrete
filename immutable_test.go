@@ -128,3 +128,34 @@ func sorted(input []rune) []rune {
 
 	return input
 }
+
+func TestImmutableSet_Union(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want []rune
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: []rune{}},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: []rune{'X', 'Y', 'Z'}},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: []rune{'x', 'y', 'z'}},
+		{name: "A + B", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: []rune{'X', 'Y', 'Z', 'x', 'y', 'z'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.Union(b)
+
+			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // subject intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // object intact
+		})
+	}
+}
