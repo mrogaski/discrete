@@ -226,3 +226,62 @@ func TestImmutableSet_Difference(t *testing.T) {
 		})
 	}
 }
+
+func TestImmutableSet_SymmetricDifference(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want []rune
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: []rune{}},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: []rune{'X', 'Y', 'Z'}},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: []rune{'x', 'y', 'z'}},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: []rune{}},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: []rune{'W', 'Z'}},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: []rune{'X', 'Y', 'Z', 'x', 'y', 'z'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.SymmetricDifference(b)
+
+			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
+}
+
+func TestImmutableSet_Copy(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		members []rune
+	}{
+		{name: "empty", members: []rune{}},
+		{name: "1 member", members: []rune{'A'}},
+		{name: "2 members", members: []rune{'A', 'Z'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := set.NewImmutableSet(tt.members...)
+			sp := s.Copy()
+
+			assert.Equal(t, s, sp)
+			assert.NotSame(t, s, sp)
+		})
+	}
+}

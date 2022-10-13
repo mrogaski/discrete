@@ -100,3 +100,14 @@ func (s *ImmutableSet[T]) Difference(sp *ImmutableSet[T]) *ImmutableSet[T] {
 
 	return NewImmutableSet(members...)
 }
+
+// SymmetricDifference returns a set whose members are an exclusive disjunction of both the receiver and argument sets,
+// belonging to either set but not both.
+func (s *ImmutableSet[T]) SymmetricDifference(sp *ImmutableSet[T]) *ImmutableSet[T] {
+	return s.Union(sp).Difference(s.Intersection(sp))
+}
+
+// Copy returns a new set with the same members as the original set.
+func (s *ImmutableSet[T]) Copy() *ImmutableSet[T] {
+	return NewImmutableSet(s.Members()...)
+}
