@@ -1,2 +1,2 @@
-# go-set
-Generic set types in Go
+# discrete
+Generic discrete structures in Go

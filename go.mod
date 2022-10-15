@@ -1,4 +1,4 @@
-module github.com/mrogaski/go-set
+module github.com/mrogaski/discrete
 
 go 1.19
 

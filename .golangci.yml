@@ -26,7 +26,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/mrogaski/go-set)
+      - prefix(github.com/mrogaski/discrete)
   ireturn:
     allow:
       - T
