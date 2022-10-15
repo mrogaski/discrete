@@ -1,0 +1,39 @@
+run:
+  tests: true
+linters:
+  enable-all: true
+  disable:
+    - deadcode
+    - exhaustivestruct
+    - funlen
+    - godox
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nosnakecase
+    - rowserrcheck
+    - scopelint
+    - structcheck
+    - sqlclosecheck
+    - structcheck
+    - varcheck
+    - varnamelen
+    - wastedassign
+
+issues:
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      linters:
+        - dupl
+
+linters-settings:
+
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/mrogaski/discrete)
+  ireturn:
+    allow:
+      - T
