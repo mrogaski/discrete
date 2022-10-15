@@ -3,25 +3,30 @@
 // Member type must be comparable.
 package set
 
-// An ImmutableSet is a collection of unique elements.
+// An ImmutableSet is a collection of unique members.
 type ImmutableSet[T comparable] struct {
 	elements map[T]nothing
 }
 
 type nothing struct{}
 
-// NewImmutableSet returns an immutable set containing any member elements passed as arguments.
+type set[T comparable] map[T]nothing
+
+// NewImmutableSet returns an immutable set containing any member members passed as arguments.
 // Any duplicate arguments will be ignored.
 func NewImmutableSet[T comparable](elements ...T) *ImmutableSet[T] {
-	var nihil nothing
+	return &ImmutableSet[T]{elements: newSet(elements...)}
+}
 
-	seq := make(map[T]nothing, len(elements))
+func newSet[T comparable](elements ...T) set[T] {
+	var nihil nothing
+	result := make(set[T], len(elements))
 
 	for _, elem := range elements {
-		seq[elem] = nihil
+		result[elem] = nihil
 	}
 
-	return &ImmutableSet[T]{elements: seq}
+	return result
 }
 
 // Contains returns true if the given element is a member of the set.
@@ -31,19 +36,23 @@ func (s *ImmutableSet[T]) Contains(elem T) bool {
 	return found
 }
 
-// Size returns a count of the number of elements contained in the set.
+// Size returns a count of the number of members contained in the set.
 func (s *ImmutableSet[T]) Size() int {
 	return len(s.elements)
 }
 
-// Members returns a slice containing the set elements.
+// Members returns a slice containing the set members.
 // There is no guaranteed ordering.
 func (s *ImmutableSet[T]) Members() []T {
-	result := make([]T, len(s.elements))
+	return members(s.elements)
+}
+
+func members[T comparable](s set[T]) []T {
+	result := make([]T, len(s))
 
 	i := 0
 
-	for elem := range s.elements {
+	for elem := range s {
 		result[i] = elem
 		i++
 	}
@@ -51,9 +60,9 @@ func (s *ImmutableSet[T]) Members() []T {
 	return result
 }
 
-// Copy returns a new set with the same elements as the original set.
+// Copy returns a new set with the same members as the original set.
 func (s *ImmutableSet[T]) Copy() *ImmutableSet[T] {
-	return NewImmutableSet(s.Members()...)
+	return NewImmutableSet(members(s.elements)...)
 }
 
 // IsEqual returns true is the set is equal to the argument set, false otherwise.
@@ -63,8 +72,9 @@ func (s *ImmutableSet[T]) IsEqual(sp *ImmutableSet[T]) bool {
 
 // IsSubset returns true is the set is a subset of the argument set, false otherwise.
 func (s *ImmutableSet[T]) IsSubset(sp *ImmutableSet[T]) bool {
-	for _, elem := range s.Members() {
-		if !sp.Contains(elem) {
+	for elem := range s.elements {
+		_, found := sp.elements[elem]
+		if !found {
 			return false
 		}
 	}
@@ -77,7 +87,7 @@ func (s *ImmutableSet[T]) IsProperSubset(sp *ImmutableSet[T]) bool {
 	return s.IsSubset(sp) && !s.IsEqual(sp)
 }
 
-// Union returns a set whose elements are a disjunction of both the receiver and argument sets, belonging to either set.
+// Union returns a set whose members are a disjunction of both the receiver and argument sets, belonging to either set.
 func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	members := make([]T, s.Size()+sp.Size())
 
@@ -96,7 +106,7 @@ func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	return NewImmutableSet[T](members...)
 }
 
-// Intersection returns a set whose elements are a conjunction of both the receiver and argument sets, belonging
+// Intersection returns a set whose members are a conjunction of both the receiver and argument sets, belonging
 // to one set or the other but not both.
 func (s *ImmutableSet[T]) Intersection(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	members := make([]T, 0)
@@ -112,7 +122,7 @@ func (s *ImmutableSet[T]) Intersection(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	return NewImmutableSet(members...)
 }
 
-// Difference returns a set whose elements belong to the receiver but not the set passed as an argument.
+// Difference returns a set whose members belong to the receiver but not the set passed as an argument.
 func (s *ImmutableSet[T]) Difference(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	members := make([]T, 0)
 
@@ -127,7 +137,7 @@ func (s *ImmutableSet[T]) Difference(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	return NewImmutableSet(members...)
 }
 
-// SymmetricDifference returns a set whose elements are an exclusive disjunction of both the receiver and argument sets,
+// SymmetricDifference returns a set whose members are an exclusive disjunction of both the receiver and argument sets,
 // belonging to either set but not both.
 func (s *ImmutableSet[T]) SymmetricDifference(sp *ImmutableSet[T]) *ImmutableSet[T] {
 	return s.Union(sp).Difference(s.Intersection(sp))

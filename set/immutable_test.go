@@ -18,7 +18,7 @@ func TestNewImmutableSet(t *testing.T) {
 	}{
 		{name: "empty", members: []rune{}},
 		{name: "1 member", members: []rune{'A'}},
-		{name: "2 elements", members: []rune{'A', 'Z'}},
+		{name: "2 members", members: []rune{'A', 'Z'}},
 	}
 
 	for _, tt := range tests {
@@ -138,7 +138,7 @@ func TestImmutableSet_Copy(t *testing.T) {
 	}{
 		{name: "empty", members: []rune{}},
 		{name: "1 member", members: []rune{'A'}},
-		{name: "2 elements", members: []rune{'A', 'Z'}},
+		{name: "2 members", members: []rune{'A', 'Z'}},
 	}
 
 	for _, tt := range tests {
