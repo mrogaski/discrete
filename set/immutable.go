@@ -1,3 +1,6 @@
+// Package set implements generic set types.
+//
+// Member type must be comparable.
 package set
 
 // An ImmutableSet is a collection of unique members.
