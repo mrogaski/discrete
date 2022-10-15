@@ -18,7 +18,7 @@ func TestNewImmutableSet(t *testing.T) {
 	}{
 		{name: "empty", members: []rune{}},
 		{name: "1 member", members: []rune{'A'}},
-		{name: "2 members", members: []rune{'A', 'Z'}},
+		{name: "2 elements", members: []rune{'A', 'Z'}},
 	}
 
 	for _, tt := range tests {
@@ -127,6 +127,131 @@ func sorted(input []rune) []rune {
 	})
 
 	return input
+}
+
+func TestImmutableSet_Copy(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		members []rune
+	}{
+		{name: "empty", members: []rune{}},
+		{name: "1 member", members: []rune{'A'}},
+		{name: "2 elements", members: []rune{'A', 'Z'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := set.NewImmutableSet(tt.members...)
+			sp := s.Copy()
+
+			assert.Equal(t, s, sp)
+			assert.NotSame(t, s, sp)
+		})
+	}
+}
+
+func TestImmutableSet_IsEqual(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want bool
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: true},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: false},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: false},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: true},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: false},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: false},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.IsEqual(b)
+
+			assert.Equal(t, tt.want, result)
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
+}
+
+func TestImmutableSet_IsSubset(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want bool
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: true},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: false},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: true},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: true},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: false},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: false},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.IsSubset(b)
+
+			assert.Equal(t, tt.want, result)
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
+}
+
+func TestImmutableSet_IsProperSubset(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		a    []rune
+		b    []rune
+		want bool
+	}{
+		{name: "both empty", a: []rune{}, b: []rune{}, want: false},
+		{name: "A + empty", a: []rune{'X', 'Y', 'Z'}, b: []rune{}, want: false},
+		{name: "empty + B", a: []rune{}, b: []rune{'x', 'y', 'z'}, want: true},
+		{name: "identical", a: []rune{'X', 'Y', 'Z'}, b: []rune{'X', 'Y', 'Z'}, want: false},
+		{name: "overlap", a: []rune{'X', 'Y', 'Z'}, b: []rune{'W', 'X', 'Y'}, want: false},
+		{name: "disjoint", a: []rune{'X', 'Y', 'Z'}, b: []rune{'x', 'y', 'z'}, want: false},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			a := set.NewImmutableSet(tt.a...)
+			b := set.NewImmutableSet(tt.b...)
+			result := a.IsProperSubset(b)
+
+			assert.Equal(t, tt.want, result)
+			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
+			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
+		})
+	}
 }
 
 func TestImmutableSet_Union(t *testing.T) {
@@ -256,32 +381,6 @@ func TestImmutableSet_SymmetricDifference(t *testing.T) {
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
 			assert.Equal(t, sorted(tt.a), sorted(a.Members())) // receiver intact
 			assert.Equal(t, sorted(tt.b), sorted(b.Members())) // argument intact
-		})
-	}
-}
-
-func TestImmutableSet_Copy(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name    string
-		members []rune
-	}{
-		{name: "empty", members: []rune{}},
-		{name: "1 member", members: []rune{'A'}},
-		{name: "2 members", members: []rune{'A', 'Z'}},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			s := set.NewImmutableSet(tt.members...)
-			sp := s.Copy()
-
-			assert.Equal(t, s, sp)
-			assert.NotSame(t, s, sp)
 		})
 	}
 }
