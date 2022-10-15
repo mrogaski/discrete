@@ -129,6 +129,62 @@ func sorted(input []rune) []rune {
 	return input
 }
 
+func TestImmutableSet_Insert(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		members []rune
+		element rune
+		want    []rune
+	}{
+		{name: "empty", members: []rune{}, element: 'A', want: []rune{'A'}},
+		{name: "new member", members: []rune{'A', 'B'}, element: 'C', want: []rune{'A', 'B', 'C'}},
+		{name: "existing member", members: []rune{'A', 'B'}, element: 'B', want: []rune{'A', 'B'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := set.NewImmutableSet(tt.members...)
+			sp := s.Insert(tt.element)
+
+			assert.Equal(t, sorted(tt.want), sorted(sp.Members()))
+			assert.Equal(t, sorted(tt.members), sorted(s.Members())) // receiver intact
+		})
+	}
+}
+
+func TestImmutableSet_Delete(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		members []rune
+		element rune
+		want    []rune
+	}{
+		{name: "empty", members: []rune{}, element: 'A', want: []rune{}},
+		{name: "existing member", members: []rune{'A', 'B', 'C'}, element: 'C', want: []rune{'A', 'B'}},
+		{name: "missing member", members: []rune{'A', 'B'}, element: 'C', want: []rune{'A', 'B'}},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			s := set.NewImmutableSet(tt.members...)
+			sp := s.Delete(tt.element)
+
+			assert.Equal(t, sorted(tt.want), sorted(sp.Members()))
+			assert.Equal(t, sorted(tt.members), sorted(s.Members())) // receiver intact
+		})
+	}
+}
+
 func TestImmutableSet_Copy(t *testing.T) {
 	t.Parallel()
 

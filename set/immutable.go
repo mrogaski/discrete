@@ -29,6 +29,33 @@ func (s *ImmutableSet[T]) Members() []T {
 	return members(s.elements)
 }
 
+// Insert returns a copy of the see with a new element inserted.
+// This method is idempotent.
+func (s *ImmutableSet[T]) Insert(elem T) *ImmutableSet[T] {
+	m := members(s.elements)
+
+	return NewImmutableSet(append(m, elem)...)
+}
+
+// Delete returns a copy of the see with the specified element deleted.
+// This method is idempotent.
+func (s *ImmutableSet[T]) Delete(elem T) *ImmutableSet[T] {
+	_, found := s.elements[elem]
+	if !found {
+		return NewImmutableSet(members(s.elements)...)
+	}
+
+	m := make([]T, 0, len(s.elements)-1)
+
+	for _, x := range members(s.elements) {
+		if x != elem {
+			m = append(m, x)
+		}
+	}
+
+	return NewImmutableSet(m...)
+}
+
 // Copy returns a new set with the same members as the original set.
 func (s *ImmutableSet[T]) Copy() *ImmutableSet[T] {
 	return NewImmutableSet(members(s.elements)...)
