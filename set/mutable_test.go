@@ -8,7 +8,7 @@ import (
 	"github.com/mrogaski/discrete/set"
 )
 
-func TestNewImmutableSet(t *testing.T) {
+func TestNewMutableSet(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -25,14 +25,14 @@ func TestNewImmutableSet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
+			s := set.NewMutableSet(tt.members...)
 
-			assert.IsType(t, &set.ImmutableSet[rune]{}, s)
+			assert.IsType(t, &set.MutableSet[rune]{}, s)
 		})
 	}
 }
 
-func TestImmutableSet_Contains(t *testing.T) {
+func TestMutableSet_Contains(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -54,14 +54,14 @@ func TestImmutableSet_Contains(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
+			s := set.NewMutableSet(tt.members...)
 
 			assert.Equal(t, tt.want, s.Contains(tt.elem))
 		})
 	}
 }
 
-func TestImmutableSet_Size(t *testing.T) {
+func TestMutableSet_Size(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -81,14 +81,14 @@ func TestImmutableSet_Size(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
+			s := set.NewMutableSet(tt.members...)
 
 			assert.Equal(t, tt.want, s.Size())
 		})
 	}
 }
 
-func TestImmutableSet_Members(t *testing.T) {
+func TestMutableSet_Members(t *testing.T) {
 	t.Parallel()
 
 	sequence := make([]rune, 0)
@@ -110,14 +110,14 @@ func TestImmutableSet_Members(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
+			s := set.NewMutableSet(tt.members...)
 
 			assert.Equal(t, sorted(tt.members), sorted(s.Members()))
 		})
 	}
 }
 
-func TestImmutableSet_Insert(t *testing.T) {
+func TestMutableSet_Insert(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -136,16 +136,15 @@ func TestImmutableSet_Insert(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
-			sp := s.Insert(tt.element)
+			s := set.NewMutableSet(tt.members...)
 
-			assert.Equal(t, sorted(tt.want), sorted(sp.Members()))
-			assert.Equal(t, sorted(tt.members), sorted(s.Members())) // receiver intact
+			assert.Equal(t, tt.element, s.Insert(tt.element))
+			assert.Equal(t, sorted(tt.want), sorted(s.Members()))
 		})
 	}
 }
 
-func TestImmutableSet_Delete(t *testing.T) {
+func TestMutableSet_Delete(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -164,16 +163,15 @@ func TestImmutableSet_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
-			sp := s.Delete(tt.element)
+			s := set.NewMutableSet(tt.members...)
 
-			assert.Equal(t, sorted(tt.want), sorted(sp.Members()))
-			assert.Equal(t, sorted(tt.members), sorted(s.Members())) // receiver intact
+			assert.Equal(t, tt.element, s.Delete(tt.element))
+			assert.Equal(t, sorted(tt.want), sorted(s.Members()))
 		})
 	}
 }
 
-func TestImmutableSet_Copy(t *testing.T) {
+func TestMutableSet_Copy(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -190,7 +188,7 @@ func TestImmutableSet_Copy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			s := set.NewImmutableSet(tt.members...)
+			s := set.NewMutableSet(tt.members...)
 			sp := s.Copy()
 
 			assert.Equal(t, s, sp)
@@ -199,7 +197,7 @@ func TestImmutableSet_Copy(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_IsSubset(t *testing.T) {
+func TestMutableSet_IsSubset(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -221,8 +219,8 @@ func TestImmutableSet_IsSubset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.IsSubset(b)
 
 			assert.Equal(t, tt.want, result)
@@ -230,7 +228,7 @@ func TestImmutableSet_IsSubset(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_IsEqual(t *testing.T) {
+func TestMutableSet_IsEqual(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -252,8 +250,8 @@ func TestImmutableSet_IsEqual(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.IsEqual(b)
 
 			assert.Equal(t, tt.want, result)
@@ -261,7 +259,7 @@ func TestImmutableSet_IsEqual(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_IsProperSubset(t *testing.T) {
+func TestMutableSet_IsProperSubset(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -283,8 +281,8 @@ func TestImmutableSet_IsProperSubset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.IsProperSubset(b)
 
 			assert.Equal(t, tt.want, result)
@@ -292,7 +290,7 @@ func TestImmutableSet_IsProperSubset(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_Union(t *testing.T) {
+func TestMutableSet_Union(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -314,8 +312,8 @@ func TestImmutableSet_Union(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.Union(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
@@ -323,7 +321,7 @@ func TestImmutableSet_Union(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_Intersection(t *testing.T) {
+func TestMutableSet_Intersection(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -345,8 +343,8 @@ func TestImmutableSet_Intersection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.Intersection(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
@@ -354,7 +352,7 @@ func TestImmutableSet_Intersection(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_Difference(t *testing.T) {
+func TestMutableSet_Difference(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -375,8 +373,8 @@ func TestImmutableSet_Difference(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.Difference(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
@@ -384,7 +382,7 @@ func TestImmutableSet_Difference(t *testing.T) {
 	}
 }
 
-func TestImmutableSet_SymmetricDifference(t *testing.T) {
+func TestMutableSet_SymmetricDifference(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -406,8 +404,8 @@ func TestImmutableSet_SymmetricDifference(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			a := set.NewImmutableSet(tt.a...)
-			b := set.NewImmutableSet(tt.b...)
+			a := set.NewMutableSet(tt.a...)
+			b := set.NewMutableSet(tt.b...)
 			result := a.SymmetricDifference(b)
 
 			assert.Equal(t, sorted(tt.want), sorted(result.Members()))
