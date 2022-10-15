@@ -90,21 +90,11 @@ func (s *ImmutableSet[T]) IsProperSubset(sp *ImmutableSet[T]) bool {
 
 // Union returns a set whose members are a disjunction of both the receiver and argument sets, belonging to either set.
 func (s *ImmutableSet[T]) Union(sp *ImmutableSet[T]) *ImmutableSet[T] {
-	members := make([]T, s.Size()+sp.Size())
+	combined := make([]T, 0, len(s.elements)+len(sp.elements))
+	combined = append(combined, members(s.elements)...)
+	combined = append(combined, members(sp.elements)...)
 
-	i := 0
-
-	for elem := range s.elements {
-		members[i] = elem
-		i++
-	}
-
-	for elem := range sp.elements {
-		members[i] = elem
-		i++
-	}
-
-	return NewImmutableSet[T](members...)
+	return NewImmutableSet[T](combined...)
 }
 
 // Intersection returns a set whose members are a conjunction of both the receiver and argument sets, belonging
