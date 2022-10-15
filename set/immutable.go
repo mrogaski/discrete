@@ -20,6 +20,7 @@ func NewImmutableSet[T comparable](elements ...T) *ImmutableSet[T] {
 
 func newSet[T comparable](elements ...T) set[T] {
 	var nihil nothing
+	
 	result := make(set[T], len(elements))
 
 	for _, elem := range elements {
